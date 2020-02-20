@@ -235,7 +235,8 @@ r"""
 
     Changelog
     =========
-
+    1.5
+        -   added support for unicode strings
     1.4
         -   added support for PHP sessions
     1.3
