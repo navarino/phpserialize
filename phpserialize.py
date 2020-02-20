@@ -520,17 +520,19 @@ def load(fp, charset='utf-8', errors=default_errors, decode_strings=False,
         raise ValueError('unexpected opcode - %s' % repr(type_))
 
     fp_position = fp.tell()
-    chunk = _read_until(':');
+    chunk = _read_until(b':');
     fp.seek(fp_position) # Reset pointer
-    if '|' in chunk:
+    if b'|' in chunk:
         # We may be dealing with a serialized session, in which case keys
         # followed by a pipe are preceding the serialized data.
         unserialized_data = {}
         while 1:
             try:
-                key = _read_until('|');
+                key = _read_until(b'|');
             except ValueError:
                 break # end of stream
+            if decode_strings:
+                key = key.decode(charset, errors)
             if return_unicode:
                 key = unicode(key, charset)
             unserialized_data[key] = _unserialize()

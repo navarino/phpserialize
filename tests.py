@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 import phpserialize
+from collections import OrderedDict
 
 
 class PhpSerializeTestCase(unittest.TestCase):
@@ -32,7 +33,8 @@ class PhpSerializeTestCase(unittest.TestCase):
                          b'a:3:{i:0;i:7;i:1;i:8;i:2;i:9;}')
 
     def test_dumps_dict(self):
-        self.assertEqual(phpserialize.dumps({'a': 1, 'b': 2, 'c': 3}),
+        od = OrderedDict({'a': 1, 'c': 3, 'b': 2})
+        self.assertEqual(phpserialize.dumps(od),
                          b'a:3:{s:1:"a";i:1;s:1:"c";i:3;s:1:"b";i:2;}')
 
     def test_loads_dict(self):
@@ -88,7 +90,7 @@ class PhpSerializeTestCase(unittest.TestCase):
         x = phpserialize.dumps(user, object_hook=dump_object_hook)
         y = phpserialize.loads(x, object_hook=load_object_hook,
                                decode_strings=True)
-        self.assert_(b'WP_User' in x)
+        self.assertTrue(b'WP_User' in x)
         self.assertEqual(type(y), type(user))
         self.assertEqual(y.username, user.username)
 
@@ -101,7 +103,7 @@ class PhpSerializeTestCase(unittest.TestCase):
 
     def test_session(self):
         data = b'foo|a:1:{s:1:"a";s:1:"b";}bar|a:1:{s:1:"c";s:1:"d";}'
-        session = phpserialize.loads(data)
+        session = phpserialize.loads(data, decode_strings=True)
         self.assertEqual(session, {'foo': {'a': 'b'}, 'bar': {'c': 'd'}})
 
     def test_loads_unicode_strings(self):
